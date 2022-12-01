@@ -11,9 +11,26 @@ var keyboard = new Map([
     ['z',0],['x',0] ,['c',0],['v',0],['b',0] ,['n',0],['m',0]
 ]);
 
+function getSecretWord() {
+    // run till non repeated lettered word is found
+    while(1) {
+        const secWord = dictionary[Math.floor(Math.random() * dictionary.length)];
+        console.log(secWord);
+
+        const myset = new Set();
+        for(let j=0; j < 5; ++j) {
+            myset.add(secWord[j]);
+        }
+
+        if(myset.size == 5) {
+            return secWord;
+        }
+    }
+}
+
 const state = {
     // secret is random word from dictionary
-    secret: dictionary[Math.floor(Math.random() * dictionary.length)],
+    secret: getSecretWord(),
     grid: Array(6)
         .fill()
         .map(() => Array(5).fill('')),
@@ -107,14 +124,17 @@ function revealWord(guess) {
             if(letter === state.secret[i]) {
                 keyboard.set(letter, 1);
                 box.classList.add('right');
+                changeLetter(letter,"green");
             } else if(state.secret.includes(letter)) {
                 if(keyboard.get(letter) != 1) {
                     keyboard.set(letter, 2);
+                    changeLetter(letter,"yellow");
                 }
                 box.classList.add('wrong');
             } else {
                 keyboard.set(letter, 3);
                 box.classList.add('empty');
+                changeLetter(letter,"gray");
             }
         }, ((i+1) * animation_duration) / 2);
 
@@ -132,6 +152,9 @@ function revealWord(guess) {
     setTimeout (() => {
         if(isWinner) {
             alert('Congratulations');
+            //window.alert('Congratulations');
+            //document.write('Congratulations');
+            
             // reloads the page and new game is started
             window.location.reload();
 
@@ -170,11 +193,108 @@ function removeLetter() {
     // go back
     state.currentCol--;
 }
+
+// changes color of letter according to status
+function changeLetter(id, color_code) {
+    const key = document.getElementById(id);
+    key.style.backgroundColor = color_code;
+    console.log(key);
+}
   
+// main function
 function startup() {
+    //// Manual button 
+    // const button = document.createElement('button');
+    // const char = "Manual";
+    // const span = document.createElement('span');
+    // span.style.fontSize = '15px';
+    // span.appendChild(document.createTextNode(char));
+    // button.appendChild(span);
+    // document.body.appendChild(button);
+    // button.setAttribute('id', char);
+    // button.style.padding = '10px';
+    // button.style.margin = '5px';
+    // button.onclick = function () {
+    //     window.open('manual.png','popUpWindow','height=595,width=600,left=300,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+    // };
+
     // build game grid
     const game = document.getElementById('game');
     drawGrid(game);
+
+    // Enter key
+    {
+        const button = document.createElement('button');
+        const char = "Enter";
+        const span = document.createElement('span');
+        span.style.fontSize = '15px';
+        span.appendChild(document.createTextNode(char));
+        button.appendChild(span);
+        document.body.appendChild(button);
+        button.setAttribute('id', char);
+        button.style.padding = '10px';
+        button.style.margin = '5px';
+        button.onclick = function () { getLetter(char) };
+    }
+
+    // builds keyboard
+    for (let i = 97; i <= 122; i++) {
+        const button = document.createElement('button');
+        const char = String.fromCharCode(i);
+        const span = document.createElement('span');
+        span.style.fontSize = '16px';
+        span.appendChild(document.createTextNode(char));
+        button.appendChild(span);
+        document.body.appendChild(button);
+        button.setAttribute('id', char);
+        button.style.padding = '10px';
+        button.style.margin = '5px';
+        button.onclick = function () { getLetter(char) };
+    }
+
+    // Delete key
+    {
+        const button = document.createElement('button');
+        const char = "Delete";
+        const span = document.createElement('span');
+        span.style.fontSize = '15px';
+        span.appendChild(document.createTextNode(char));
+        button.appendChild(span);
+        document.body.appendChild(button);
+        button.setAttribute('id', char);
+        button.style.padding = '10px';
+        button.style.margin = '5px';
+        button.onclick = function () { getLetter(char) };
+    }
+
+    function getLetter(id) {
+        const key = document.getElementById(id).textContent;
+        console.log(key);
+
+        if(key === 'Enter') {
+            if(state.currentCol === 5) {
+                const word = getCurrentWord();
+                if(isWordValid(word)) {
+                    revealWord(word);
+
+                    // go to next line
+                    state.currentRow++;
+                    state.currentCol = 0;
+                }
+                else {
+                    alert('Invalid word');
+                }
+            }
+        }
+        if(key === 'Delete') {
+            removeLetter();
+        }
+        if(isLetter(key)) {
+            addLetter(key);
+        } 
+        updateGrid();
+    }
+    // keyboard ends
 
     // for response to keys pressed
     registerKeyboardEvents();
