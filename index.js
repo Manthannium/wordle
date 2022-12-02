@@ -1,6 +1,8 @@
 import { corpus } from './dictionary.js';
 
-const testdictionary = ['earth','plane','crane','audio','house'];
+var select_audio = new Audio('select.mp3');
+select_audio.load();
+
 const dictionary = corpus;
 
 // keyboard
@@ -72,6 +74,7 @@ function drawBox(container, row, col, letter = '') {
     return box;
 }
 
+// physical keyboard input
 function registerKeyboardEvents() {
     // e is event object
     document.body.onkeydown = (e) => {
@@ -124,17 +127,17 @@ function revealWord(guess) {
             if(letter === state.secret[i]) {
                 keyboard.set(letter, 1);
                 box.classList.add('right');
-                changeLetter(letter,"green");
+                changeLetter(letter.toUpperCase(),"green");
             } else if(state.secret.includes(letter)) {
                 if(keyboard.get(letter) != 1) {
                     keyboard.set(letter, 2);
-                    changeLetter(letter,"yellow");
+                    changeLetter(letter.toUpperCase(),"yellow");
                 }
                 box.classList.add('wrong');
             } else {
                 keyboard.set(letter, 3);
                 box.classList.add('empty');
-                changeLetter(letter,"gray");
+                changeLetter(letter.toUpperCase(),"gray");
             }
         }, ((i+1) * animation_duration) / 2);
 
@@ -151,7 +154,7 @@ function revealWord(guess) {
     // because result needs to happen after all letters are revealed
     setTimeout (() => {
         if(isWinner) {
-            alert('Congratulations');
+            alert('CONGRATULATIONS!');
             //window.alert('Congratulations');
             //document.write('Congratulations');
             
@@ -159,7 +162,7 @@ function revealWord(guess) {
             window.location.reload();
 
         } else if(isGameOver) {
-            alert(`The word was ${state.secret}`);
+            alert(`The word was ${state.secret.toUpperCase()}`);
             // game over and new game is started
             window.location.reload();
         }
@@ -194,84 +197,122 @@ function removeLetter() {
     state.currentCol--;
 }
 
-// changes color of letter according to status
+// changes color of virtual keyboard letter according to status
 function changeLetter(id, color_code) {
-    const key = document.getElementById(id);
+    let key = document.getElementById(id);
     key.style.backgroundColor = color_code;
     console.log(key);
 }
   
 // main function
 function startup() {
-    //// Manual button 
-    // const button = document.createElement('button');
-    // const char = "Manual";
-    // const span = document.createElement('span');
-    // span.style.fontSize = '15px';
-    // span.appendChild(document.createTextNode(char));
-    // button.appendChild(span);
-    // document.body.appendChild(button);
-    // button.setAttribute('id', char);
-    // button.style.padding = '10px';
-    // button.style.margin = '5px';
-    // button.onclick = function () {
-    //     window.open('manual.png','popUpWindow','height=595,width=600,left=300,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
-    // };
 
     // build game grid
     const game = document.getElementById('game');
     drawGrid(game);
 
-    // Enter key
-    {
-        const button = document.createElement('button');
-        const char = "Enter";
-        const span = document.createElement('span');
-        span.style.fontSize = '15px';
-        span.appendChild(document.createTextNode(char));
-        button.appendChild(span);
-        document.body.appendChild(button);
-        button.setAttribute('id', char);
-        button.style.padding = '10px';
-        button.style.margin = '5px';
-        button.onclick = function () { getLetter(char) };
-    }
+    // build keyboard
+    const kboard1 = document.getElementById('kboard1');
+    const kboard2 = document.getElementById('kboard2');
+    const kboard3 = document.getElementById('kboard3');
+    const kboard4 = document.getElementById('kboard4');
+
+    // qwerty keyboard
+    let qwerty = [81,87,69,82,84,89,85,73,79,80, 65,83,68,70,71,72,74,75,76, 90,88,67,86,66,78,77];
 
     // builds keyboard
-    for (let i = 97; i <= 122; i++) {
+    // small 65 - 90
+    // capital 97 - 122
+    for (let j = 0; j <= 25; j++) {
+        let i = qwerty[j];
         const button = document.createElement('button');
         const char = String.fromCharCode(i);
         const span = document.createElement('span');
-        span.style.fontSize = '16px';
+        span.style.fontSize = '20px';
+        span.style.fontWeight = '600';
+        
         span.appendChild(document.createTextNode(char));
         button.appendChild(span);
-        document.body.appendChild(button);
+
+        if(j<10) kboard1.appendChild(button);
+        else if(j<19) kboard2.appendChild(button);
+        else kboard3.appendChild(button);
+        
         button.setAttribute('id', char);
-        button.style.padding = '10px';
-        button.style.margin = '5px';
+        button.style.padding = '5px';
+        button.style.margin = '2px';
+        button.style.height = '35px';
+        button.style.width = '35px';
+        button.style.borderColor = 'gray';
         button.onclick = function () { getLetter(char) };
     }
+
+    // Enter key
+    {
+        const button = document.createElement('button');
+        const char = "ENTER";
+        const span = document.createElement('span');
+        span.style.fontSize = '20px';
+        span.style.fontWeight = '600';
+        span.appendChild(document.createTextNode(char));
+        button.appendChild(span);
+        kboard4.appendChild(button);
+        button.setAttribute('id', char);
+        button.style.padding = '5px';
+        button.style.margin = '2px';
+        button.style.backgroundColor = "green";
+        button.style.borderColor = 'gray';
+        button.onclick = function () { getLetter(char) };
+    } 
+    
+    // ? Manual key
+    {
+        const button = document.createElement('button');
+        const char = "?";
+        const span = document.createElement('span');
+        span.style.fontSize = '20px';
+        span.style.fontWeight = '600';
+        span.appendChild(document.createTextNode(char));
+        button.appendChild(span);
+        kboard3.appendChild(button);
+        button.setAttribute('id', char);
+        button.style.padding = '5px';
+        button.style.margin = '2px';
+        button.style.height = '35px';
+        button.style.width = '35px';
+        button.style.borderColor = 'gray';
+        button.onclick = function () { 
+            select_audio.play();
+            window.open('manual.png','popUpWindow','height=595,width=600,left=300,top=100,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');
+        };
+    } 
 
     // Delete key
     {
         const button = document.createElement('button');
-        const char = "Delete";
+        const char = "DELETE";
         const span = document.createElement('span');
-        span.style.fontSize = '15px';
+        span.style.fontSize = '20px';
+        span.style.fontWeight = '600';
         span.appendChild(document.createTextNode(char));
         button.appendChild(span);
-        document.body.appendChild(button);
+        kboard4.appendChild(button);
         button.setAttribute('id', char);
-        button.style.padding = '10px';
-        button.style.margin = '5px';
+        button.style.padding = '5px';
+        button.style.margin = '2px';
+        button.style.backgroundColor = "red";
+        button.style.borderColor = 'gray';
         button.onclick = function () { getLetter(char) };
     }
 
+    // virtual keyboard input
     function getLetter(id) {
-        const key = document.getElementById(id).textContent;
+        select_audio.play();
+        let key = document.getElementById(id).textContent;
+        key = key.toLowerCase();
         console.log(key);
 
-        if(key === 'Enter') {
+        if(key === 'enter') {
             if(state.currentCol === 5) {
                 const word = getCurrentWord();
                 if(isWordValid(word)) {
@@ -286,7 +327,7 @@ function startup() {
                 }
             }
         }
-        if(key === 'Delete') {
+        if(key === 'delete') {
             removeLetter();
         }
         if(isLetter(key)) {
