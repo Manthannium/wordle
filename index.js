@@ -3,6 +3,7 @@ import { corpus } from './dictionary.js';
 var select_audio = new Audio('select.mp3');
 select_audio.load();
 
+const testdictionary = ['earth','plane','crane','audio','house'];
 const dictionary = corpus;
 
 // keyboard
@@ -40,6 +41,10 @@ const state = {
     // default starting cursor
     currentRow: 0,
     currentCol: 0,
+    greenpoints: 0,
+    yellowpoints: 0,
+    hinted: 0,
+    score: 0,
 };
 
 function drawGrid(container) {
@@ -91,6 +96,7 @@ function registerKeyboardEvents() {
                 }
                 else {
                     alert('Invalid word');
+                    //tempAlert("Invalid word",5000);
                 }
             }
         }
@@ -125,11 +131,13 @@ function revealWord(guess) {
 
         setTimeout(() => {
             if(letter === state.secret[i]) {
+                state.greenpoints++;
                 keyboard.set(letter, 1);
                 box.classList.add('right');
                 changeLetter(letter.toUpperCase(),"green");
             } else if(state.secret.includes(letter)) {
                 if(keyboard.get(letter) != 1) {
+                    state.yellowpoints++;
                     keyboard.set(letter, 2);
                     changeLetter(letter.toUpperCase(),"yellow");
                 }
@@ -154,9 +162,12 @@ function revealWord(guess) {
     // because result needs to happen after all letters are revealed
     setTimeout (() => {
         if(isWinner) {
-            alert('CONGRATULATIONS!');
-            //window.alert('Congratulations');
-            //document.write('Congratulations');
+            if(state.hinted == 1) {
+                alert(`Good! You got the hint`);
+            }
+            else {
+                alert(`CONGRATULATIONS! \n Your score : ${20*(6-state.currentRow) + state.greenpoints + state.yellowpoints}`);
+            }
             
             // reloads the page and new game is started
             window.location.reload();
@@ -240,9 +251,9 @@ function startup() {
         
         button.setAttribute('id', char);
         button.style.padding = '5px';
-        button.style.margin = '2px';
-        button.style.height = '35px';
-        button.style.width = '35px';
+        button.style.margin = '0.5px';
+        button.style.height = '40px';
+        button.style.width = '40px';
         button.style.borderColor = 'gray';
         button.onclick = function () { getLetter(char) };
     }
@@ -259,7 +270,7 @@ function startup() {
         kboard4.appendChild(button);
         button.setAttribute('id', char);
         button.style.padding = '5px';
-        button.style.margin = '2px';
+        button.style.margin = '0.5px';
         button.style.backgroundColor = "green";
         button.style.borderColor = 'gray';
         button.onclick = function () { getLetter(char) };
@@ -277,9 +288,9 @@ function startup() {
         kboard3.appendChild(button);
         button.setAttribute('id', char);
         button.style.padding = '5px';
-        button.style.margin = '2px';
-        button.style.height = '35px';
-        button.style.width = '35px';
+        button.style.margin = '0.5px';
+        button.style.height = '40px';
+        button.style.width = '40px';
         button.style.borderColor = 'gray';
         button.onclick = function () { 
             select_audio.play();
@@ -287,10 +298,55 @@ function startup() {
         };
     } 
 
-    // Delete key
+    // Hint key
     {
         const button = document.createElement('button');
-        const char = "DELETE";
+        const char = "★";
+        const span = document.createElement('span');
+        span.style.fontSize = '20px';
+        span.style.fontWeight = '600';
+        span.appendChild(document.createTextNode(char));
+        button.appendChild(span);
+        kboard4.appendChild(button);
+        button.setAttribute('id', char);
+        button.style.padding = '0px';
+        button.style.margin = '0.5px';
+        button.style.height = '40px';
+        button.style.width = '40px';
+        button.style.backgroundColor = "#6CC8ED";
+        button.style.borderColor = 'gray';
+        button.onclick = function () { 
+            select_audio.play();
+
+            if(state.currentRow == 5) {
+                state.hinted = 1;
+
+                // first leave these actual coorect letters
+                let temp = keyboard;
+                for(let ij=0; ij<5; ij++) {
+                    temp.set(state.secret[ij], 5);
+                }
+
+                // now cancel out each empty letter
+                let alpha = "abcdefghijklmnopqrstuvwxyz";
+                for(let ij=0; ij<26; ij++) {
+                    if(temp.get(alpha[ij]) == 0) {
+                        // box.classList.add('right');
+                        changeLetter(alpha[ij].toUpperCase(),"#6CC8ED");
+                    }
+                }
+            }
+            else {
+                alert('Hint will be activated in last trial');
+            }
+            
+        };
+    }
+
+    // Clear key
+    {
+        const button = document.createElement('button');
+        const char = "CLEAR";
         const span = document.createElement('span');
         span.style.fontSize = '20px';
         span.style.fontWeight = '600';
@@ -299,7 +355,7 @@ function startup() {
         kboard4.appendChild(button);
         button.setAttribute('id', char);
         button.style.padding = '5px';
-        button.style.margin = '2px';
+        button.style.margin = '0.5px';
         button.style.backgroundColor = "red";
         button.style.borderColor = 'gray';
         button.onclick = function () { getLetter(char) };
@@ -310,7 +366,7 @@ function startup() {
         select_audio.play();
         let key = document.getElementById(id).textContent;
         key = key.toLowerCase();
-        console.log(key);
+        //console.log(key);
 
         if(key === 'enter') {
             if(state.currentCol === 5) {
@@ -327,7 +383,7 @@ function startup() {
                 }
             }
         }
-        if(key === 'delete') {
+        if(key === 'clear') {
             removeLetter();
         }
         if(isLetter(key)) {
