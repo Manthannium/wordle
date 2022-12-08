@@ -1,7 +1,9 @@
 import { corpus } from './dictionary.js';
 
 var select_audio = new Audio('select.mp3');
+var bell_audio = new Audio('bell.mp3')
 select_audio.load();
+bell_audio.load();
 
 const testdictionary = ['earth','plane','crane','audio','house'];
 const dictionary = corpus;
@@ -79,24 +81,38 @@ function drawBox(container, row, col, letter = '') {
     return box;
 }
 
+// === SCORING SCHEME  ===
+// Guess in early trial will boost your score by 20 points
+// green points will increment your score with factor 4
+// yellow points will increment your score with factor 2
+// if you take n hints your score will be divided by n+1
+function getScore() {
+    let x = state.currentRow;
+    let y = state.greenpoints;
+    let z = state.yellowpoints;
+    let t = state.hinted;
+
+    let gscore = (2*(10*(7-x) + 2*y + z - 20))/(1 + t);
+    return gscore.toFixed();;
+}
+
 // physical keyboard input
 function registerKeyboardEvents() {
     // e is event object
     document.body.onkeydown = (e) => {
         const key = e.key;
+
         if(key === 'Enter') {
             if(state.currentCol === 5) {
                 const word = getCurrentWord();
-                if(isWordValid(word)) {
+                if(!isWordValid(word)) {
+                    alert('Invalid word');
+                }
+                else {
                     revealWord(word);
-
                     // go to next line
                     state.currentRow++;
                     state.currentCol = 0;
-                }
-                else {
-                    alert('Invalid word');
-                    //tempAlert("Invalid word",5000);
                 }
             }
         }
@@ -148,8 +164,12 @@ function revealWord(guess) {
                 changeLetter(letter.toUpperCase(),"gray");
             }
         }, ((i+1) * animation_duration) / 2);
-
-        box.classList.add('animated');
+        
+        if(state.secret == guess) {
+            box.classList.add('jiggle');
+        }
+        else box.classList.add('animated');
+        
         box.style.animationDelay = `${(i * animation_duration) / 2}ms`;
     }
 
@@ -162,25 +182,20 @@ function revealWord(guess) {
     // because result needs to happen after all letters are revealed
     setTimeout (() => {
         if(isWinner) {
-            if(state.hinted == 1) {
-                alert(`Good! You got the hint`);
-            }
-            else {
-                alert(`CONGRATULATIONS! \n Your score : ${20*(6-state.currentRow) + state.greenpoints + state.yellowpoints}`);
-            }
+            var yourScore = getScore();
+            bell_audio.play();
+            alert(`CONGRATULATIONS! \n Your score : ${yourScore}`);
             
             // reloads the page and new game is started
             window.location.reload();
-
-        } else if(isGameOver) {
+        } 
+        else if(isGameOver) {
             alert(`The word was ${state.secret.toUpperCase()}`);
+
             // game over and new game is started
             window.location.reload();
         }
-    }, 3 * animation_duration);
-
-    // print keyboard
-    console.log(keyboard);
+    }, 5 * animation_duration);
 }
 
 function isLetter(key) {
@@ -212,8 +227,21 @@ function removeLetter() {
 function changeLetter(id, color_code) {
     let key = document.getElementById(id);
     key.style.backgroundColor = color_code;
-    console.log(key);
 }
+
+var meaningHint = "Sorry, Hint not found!";
+
+// Function to get meaning of word
+function getMeaning(word) {
+    let url = `https://api.dictionaryapi.dev/api/v2/entries/en/${word}`;
+    fetch(url).then(response => response.json()).then(result => {
+        let definitions = result[0].meanings[0].definitions[1];
+        meaningHint = definitions.definition;
+    }).catch(() => {
+        console.log('sorry can not find');
+    });
+}
+getMeaning(state.secret);
   
 // main function
 function startup() {
@@ -232,8 +260,6 @@ function startup() {
     let qwerty = [81,87,69,82,84,89,85,73,79,80, 65,83,68,70,71,72,74,75,76, 90,88,67,86,66,78,77];
 
     // builds keyboard
-    // small 65 - 90
-    // capital 97 - 122
     for (let j = 0; j <= 25; j++) {
         let i = qwerty[j];
         const button = document.createElement('button');
@@ -252,8 +278,8 @@ function startup() {
         button.setAttribute('id', char);
         button.style.padding = '5px';
         button.style.margin = '0.5px';
-        button.style.height = '40px';
-        button.style.width = '40px';
+        button.style.height = '35px';
+        button.style.width = '35px';
         button.style.borderColor = 'gray';
         button.onclick = function () { getLetter(char) };
     }
@@ -289,8 +315,8 @@ function startup() {
         button.setAttribute('id', char);
         button.style.padding = '5px';
         button.style.margin = '0.5px';
-        button.style.height = '40px';
-        button.style.width = '40px';
+        button.style.height = '35px';
+        button.style.width = '35px';
         button.style.borderColor = 'gray';
         button.onclick = function () { 
             select_audio.play();
@@ -298,7 +324,7 @@ function startup() {
         };
     } 
 
-    // Hint key
+    // dictionary Hint key // ⭐
     {
         const button = document.createElement('button');
         const char = "★";
@@ -313,31 +339,35 @@ function startup() {
         button.style.margin = '0.5px';
         button.style.height = '40px';
         button.style.width = '40px';
-        button.style.backgroundColor = "#6CC8ED";
+        button.style.backgroundColor = "aqua";
         button.style.borderColor = 'gray';
         button.onclick = function () { 
-            select_audio.play();
+            bell_audio.play();
 
-            if(state.currentRow == 5) {
-                state.hinted = 1;
+            if(state.currentRow >= 2) {
+                state.hinted++;
 
-                // first leave these actual coorect letters
-                let temp = keyboard;
-                for(let ij=0; ij<5; ij++) {
-                    temp.set(state.secret[ij], 5);
+                try {
+                    blurt(
+                        'Hint',
+                        meaningHint,
+                        'success'
+                    );
                 }
-
-                // now cancel out each empty letter
-                let alpha = "abcdefghijklmnopqrstuvwxyz";
-                for(let ij=0; ij<26; ij++) {
-                    if(temp.get(alpha[ij]) == 0) {
-                        // box.classList.add('right');
-                        changeLetter(alpha[ij].toUpperCase(),"#6CC8ED");
-                    }
+                catch(err) {
+                    blurt(
+                        'Sorry',
+                        'Hint not found',
+                        'success'
+                    );
                 }
             }
             else {
-                alert('Hint will be activated in last trial');
+                blurt(
+                    'OOPS!',
+                    'Hint will be activated after 2nd trial',
+                    'success'
+                );
             }
             
         };
@@ -366,7 +396,6 @@ function startup() {
         select_audio.play();
         let key = document.getElementById(id).textContent;
         key = key.toLowerCase();
-        //console.log(key);
 
         if(key === 'enter') {
             if(state.currentCol === 5) {
@@ -395,6 +424,10 @@ function startup() {
 
     // for response to keys pressed
     registerKeyboardEvents();
+
+    window.addEventListener('contextmenu', (event) => {
+        event.preventDefault()
+    })
 
     // writes to browser console
     console.log(state.secret);

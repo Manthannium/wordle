@@ -1,6 +1,7 @@
 html,
 body {
     background: var(--default);
+    background-image: url("space.jpg");
 }
 
 :root {
@@ -80,6 +81,10 @@ body {
     animation: flip 0.5s ease;
 }
 
+.jiggle {
+    animation: shake 1.5s;
+}
+
 /* flipping animations */
 @keyframes flip {
     0% {
@@ -91,4 +96,15 @@ body {
     100% {
         transform: scaleY(1);
     }
+}
+
+@keyframes shake {
+    0% { transform: scaleY(1); }
+    20% { transform: scaleY(0); }
+    40% { transform: scaleY(1); }
+    60% { transform: translate(0px, 0px) rotate(0deg); }
+    70% { transform: translate(0px, -3px) rotate(0deg); }
+    80% { transform: translate(0px, -6px) rotate(0deg); }
+    90% { transform: translate(0px, -3px) rotate(0deg); }
+    100% { transform: translate(0px, 0px) rotate(0deg); }
 }
