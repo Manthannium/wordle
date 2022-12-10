@@ -1,5 +1,6 @@
-# Wordle Game
-### https://wordle-manthannium.vercel.app/
+# Wordle Game 
+## https://wordle-manthannium.vercel.app/
+![game](https://github.com/Manthannium/wordle/blob/main/images/gamesnap.png)
 
 Alternate link - https://wordle-rho-lake.vercel.app/ 
 
