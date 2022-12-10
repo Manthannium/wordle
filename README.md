@@ -1,5 +1,5 @@
 # Wordle Game
-https://wordle-manthannium.vercel.app/
+### https://wordle-manthannium.vercel.app/
 
 # Scoring scheme
 
