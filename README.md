@@ -5,7 +5,7 @@
 Alternate link - https://wordle-rho-lake.vercel.app/ 
 
 ### 🎮 Technologies Used
-
+![image](https://user-images.githubusercontent.com/82395430/206865895-5a45d318-8114-4dee-b335-13892f4c5712.png)
 
 ### 💎 New features
 - Programmer-friendly Dark UI with cool animations
