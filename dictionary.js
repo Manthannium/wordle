@@ -1,4 +1,4 @@
-export const corpus = [
+export const myDictionary = [
   "there",
   "their",
   "about",
