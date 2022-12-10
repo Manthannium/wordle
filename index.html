@@ -5,28 +5,29 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <title>Wordle</title>
-    <link rel="icon" href="logo.png" type="image/x-icon">
-    <link rel="stylesheet" href="style.css" />
 
-    <!-- blurt alerts -->
-    <link rel="stylesheet" href="blurt.min.css">
-    <script src="blurt.min.js"></script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-
+    <!-- for browser logo -->   <link rel="icon" href="../images/logo.png" type="image/x-icon">                              
+    <!-- for blurt alerts -->   <link rel="stylesheet" href="../libraries/blurt.min.css">           
+                                <script src="../libraries/blurt.min.js"></script>
+    <!-- for sweet alerts -->   <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <!-- for jquery -->         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <!-- for importing CSS -->  <link rel="stylesheet" href="style.css" /> 
 </head>
 <body>
-    <h2 style="color:powderblue; font-family:verdana; text-align:center;">WORDLE</h2>
+    <h2>WORDLE</h2>
     <div id = "game">
         <div class="grid">
         </div>
     </div> 
 
-    <div id = "kboard1"></div>
-    <div id = "kboard2"></div>
-    <div id = "kboard3"></div>
-    <div id = "kboard4"></div>
-
-    <script src="index.js" type="module"></script>
+    <div id = "keyboard">
+        <div id = "kboard1"></div>
+        <div id = "kboard2"></div>
+        <div id = "kboard3"></div>
+        <div id = "kboard4"></div>
+    </div>
+    
+    <script src="script.js" type="module"></script>
     
 </body>
 </html>

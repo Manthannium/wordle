@@ -1,7 +1,15 @@
 html,
 body {
     background: var(--default);
-    background-image: url("space.jpg");
+    background-color: black;
+    /* background-image: url("../images/space.jpg");  */
+}
+
+h2 {
+    color:white; 
+    font-family:verdana; 
+    text-align:center; 
+    opacity:0.5
 }
 
 :root {
@@ -21,24 +29,18 @@ body {
     height: 56vh;
 }
 
-#kboard1 {
-    display: flex;
+#keyboard {
+    display: grid;
     justify-content: center;
+    align-items: stretch;
+    width: 100%;
+    height: 24vh;
+    /* background-color: gray; */
 }
 
-#kboard2 {
+#kboard1, #kboard2, #kboard3, #kboard4 {
     display: flex;
     justify-content: center;
-}
-
-#kboard3 {
-    display: flex;
-    justify-content: center;
-}
-
-#kboard4 {
-    display: flex;
-    justify-content: center; 
 }
 
 .grid {
@@ -57,7 +59,7 @@ body {
     display: grid;
     place-items: center;
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.7rem;
     font-weight: bold;
 }
 
@@ -85,26 +87,28 @@ body {
     animation: shake 1.5s;
 }
 
+.keybutton {
+    padding: 2px;
+    margin: 0.5px;
+    height: 35px;
+    border-color: white;
+    opacity: 0.9;
+}
+
 /* flipping animations */
 @keyframes flip {
-    0% {
-        transform: scaleY(1);
-    }
-    50% {
-        transform: scaleY(0);
-    }
-    100% {
-        transform: scaleY(1);
-    }
+    0%   { transform: scaleY(1); }
+    50%  { transform: scaleY(0); }
+    100% { transform: scaleY(1); }
 }
 
 @keyframes shake {
-    0% { transform: scaleY(1); }
-    20% { transform: scaleY(0); }
-    40% { transform: scaleY(1); }
-    60% { transform: translate(0px, 0px) rotate(0deg); }
-    70% { transform: translate(0px, -3px) rotate(0deg); }
-    80% { transform: translate(0px, -6px) rotate(0deg); }
-    90% { transform: translate(0px, -3px) rotate(0deg); }
-    100% { transform: translate(0px, 0px) rotate(0deg); }
+    0%   { transform: scaleY(1); }
+    20%  { transform: scaleY(0); }
+    40%  { transform: scaleY(1); }
+    60%  { transform: translate(0px,  0px) rotate(0deg); }
+    70%  { transform: translate(0px, -3px) rotate(0deg); }
+    80%  { transform: translate(0px, -6px) rotate(0deg); }
+    90%  { transform: translate(0px, -3px) rotate(0deg); }
+    100% { transform: translate(0px,  0px) rotate(0deg); }
 }
