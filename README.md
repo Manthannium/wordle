@@ -10,7 +10,7 @@ Alternate link - https://wordle-rho-lake.vercel.app/
 # 💎 New features
 - Programmer-friendly Dark UI with cool animations
 - Virtual keyboard with sound effects
-- Hint feature revealing word's meaning
+- Dictionary API for fetching hint
 
 # 🏆 Scoring scheme
 - Each guess will cost 20 points
